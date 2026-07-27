@@ -1,3 +1,4 @@
+import os
 from telegram import (
     Update,
     InlineKeyboardButton,
@@ -10,39 +11,21 @@ from telegram.ext import (
     ContextTypes,
 )
 
-TOKEN = "YOUR_BOT_TOKEN"
+TOKEN = os.getenv("TOKEN")
+
+if not TOKEN:
+    raise ValueError("TOKEN environment variable not found!")
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
+        [InlineKeyboardButton("📢 Canal Oficial", url="https://t.me/lily_grupo_aj")],
+        [InlineKeyboardButton("🌐 Site Oficial", url="https://grupoaj.com")],
+        [InlineKeyboardButton("💬 Suporte", url="https://t.me/lily_grupo_aj")],
         [
-            InlineKeyboardButton(
-                "📢 Canal Oficial",
-                url="https://t.me/lily_grupo_aj",
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "🌐 Site Oficial",
-                url="https://grupoaj.com",
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "💬 Suporte",
-                url="https://t.me/lily_grupo_aj",
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "ℹ️ Sobre",
-                callback_data="about",
-            ),
-            InlineKeyboardButton(
-                "🔒 Privacidade",
-                callback_data="privacy",
-            ),
+            InlineKeyboardButton("ℹ️ Sobre", callback_data="about"),
+            InlineKeyboardButton("🔒 Privacidade", callback_data="privacy"),
         ],
     ]
 
@@ -50,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👋 *Bem-vindo ao Bot Oficial da Lily Gerente!*\n\n"
         "Aqui você encontra acesso rápido ao nosso canal oficial, "
         "site e suporte.\n\n"
-        "👇 *Escolha uma opção abaixo:*"
+        "👇 *Escolha uma opção:*"
     )
 
     await update.message.reply_text(
@@ -60,15 +43,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
     if query.data == "about":
         await query.edit_message_text(
             "ℹ️ *Sobre*\n\n"
-            "Lily Gerente é o canal oficial para informações, "
-            "site e suporte.",
+            "Este é o Bot Oficial da Lily Gerente.\n"
+            "Utilize apenas nossos canais oficiais.",
             parse_mode="Markdown",
         )
 
@@ -76,15 +59,20 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(
             "🔒 *Privacidade*\n\n"
             "Nunca compartilhe sua senha ou código de verificação.\n"
-            "Utilize apenas nossos canais oficiais.",
+            "Use somente nossos links oficiais.",
             parse_mode="Markdown",
         )
 
 
-app = Application.builder().token(TOKEN).build()
+def main():
+    app = Application.builder().token(TOKEN).build()
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(CallbackQueryHandler(button))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(buttons))
 
-print("Bot Online...")
-app.run_polling()
+    print("Bot Online...")
+    app.run_polling()
+
+
+if __name__ == "__main__":
+    main()

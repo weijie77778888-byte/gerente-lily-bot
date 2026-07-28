@@ -1,50 +1,41 @@
 import os
-import logging
-
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import Application, CommandHandler, ContextTypes
-
-
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
 )
 
 TOKEN = os.getenv("TOKEN")
 
 if not TOKEN:
-    raise RuntimeError(
-        "TOKEN not found. Add TOKEN in Railway Variables."
-    )
+    raise RuntimeError("TOKEN not found. Please add TOKEN in Railway Variables.")
 
 
-def main_menu() -> InlineKeyboardMarkup:
+def menu():
     keyboard = [
         [
             InlineKeyboardButton(
                 "🤝 CANAL Cooperar",
-                url="https://t.me/lily_grupo_aj",
+                url="https://t.me/lily_grupo_aj"
             )
         ],
         [
             InlineKeyboardButton(
                 "📷 INSTAGRAM",
-                url="https://www.instagram.com/lily__gerente",
+                url="https://www.instagram.com/lily__gerente"
             )
         ],
         [
             InlineKeyboardButton(
                 "💬 SUPPORT",
-                url=(
-                    "https://vue.livehelp100service.com/"
-                    "03ddbf9d379cab2jkfle-kelid2bd983091ae237dc6ecf19c4463c6b4b98ff9f1fda5365b7b73424b20baef28"
-                ),
+                url="https://vue.livehelp100service.com/03ddbf9d379cab2jkfle-kelid2bd983091ae237dc6ecf19c4463c6b4b98ff9f1fda5365b7b73424b20baef28"
             )
         ],
         [
             InlineKeyboardButton(
                 "🌐 WEBSITE",
-                url="https://www.ajgrupo.com",
+                url="https://www.ajgrupo.com"
             )
         ],
     ]
@@ -52,52 +43,54 @@ def main_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def start(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
-        "👋 Olá! Bem-vindo ao Bot Oficial Lily Gerente.\n\n"
+        "👋 *Bem-vindo ao Bot Oficial Lily Gerente!*\n\n"
         "Escolha uma opção abaixo:"
     )
 
-    if update.message:
-        await update.message.reply_text(
-            text=text,
-            reply_markup=main_menu(),
-        )
+    await update.message.reply_text(
+        text=text,
+        parse_mode="Markdown",
+        reply_markup=menu(),
+    )
 
 
-async def menu(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-) -> None:
-    if update.message:
-        await update.message.reply_text(
-            "📋 Menu principal:",
-            reply_markup=main_menu(),
-        )
+async def canal(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "🤝 Canal Cooperar\n\nhttps://t.me/lily_grupo_aj"
+    )
 
 
-async def help_command(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-) -> None:
-    if update.message:
-        await update.message.reply_text(
-            "Use /start ou /menu para abrir o menu.",
-            reply_markup=main_menu(),
-        )
+async def instagram(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "📷 Instagram Oficial\n\nhttps://www.instagram.com/lily__gerente"
+    )
 
 
-def main() -> None:
+async def support(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "💬 Suporte Oficial\n\nhttps://vue.livehelp100service.com/03ddbf9d379cab2jkfle-kelid2bd983091ae237dc6ecf19c4463c6b4b98ff9f1fda5365b7b73424b20baef28"
+    )
+
+
+async def website(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "🌐 Website Oficial\n\nhttps://www.ajgrupo.com"
+    )
+
+
+def main():
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("menu", menu))
-    app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("canal", canal))
+    app.add_handler(CommandHandler("instagram", instagram))
+    app.add_handler(CommandHandler("support", support))
+    app.add_handler(CommandHandler("website", website))
 
-    print("✅ Lily Gerente Bot is online")
+    print("✅ Lily Gerente Bot Online")
+
     app.run_polling(drop_pending_updates=True)
 
 
